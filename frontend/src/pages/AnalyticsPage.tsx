@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { apiFetch } from '../lib/api';
 
 interface Stats {
   totalAttendees: number;
@@ -18,7 +19,7 @@ export default function AnalyticsPage() {
       setError('Please log in as a creator to see analytics.');
       return;
     }
-    fetch('/api/analytics/creator', { headers: { Authorization: `Bearer ${token}` } })
+    apiFetch('/api/analytics/creator', { headers: { Authorization: `Bearer ${token}` } })
       .then((res) => res.json())
       .then((data) => setStats(data))
       .catch(() => setError('Unable to load analytics.'));

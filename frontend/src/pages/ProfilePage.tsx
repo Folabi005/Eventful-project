@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { apiFetch } from '../lib/api';
 
 export default function ProfilePage() {
   const [reminders, setReminders] = useState<Array<{ id: string; eventId: string; remindAt: string }>>([]);
@@ -16,7 +17,7 @@ export default function ProfilePage() {
       setError('Please log in to see reminders.');
       return;
     }
-    fetch('/api/reminders/me', { headers: { Authorization: `Bearer ${token}` } })
+    apiFetch('/api/reminders/me', { headers: { Authorization: `Bearer ${token}` } })
       .then((res) => res.json())
       .then((data) => setReminders(data))
       .catch(() => setError('Unable to load reminders.'));

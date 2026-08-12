@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { apiFetch } from '../lib/api';
 
 interface ApplicantItem {
   id: string;
@@ -18,7 +19,7 @@ export default function ApplicantPage() {
       return;
     }
 
-    fetch('/api/applicants/creator', { headers: { Authorization: `Bearer ${token}` } })
+    apiFetch('/api/applicants/creator', { headers: { Authorization: `Bearer ${token}` } })
       .then((res) => res.json())
       .then((data) => setApplicants(data))
       .catch(() => setError('Unable to load applicants.'));

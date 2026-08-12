@@ -1,4 +1,5 @@
 import { FormEvent, useState } from 'react';
+import { apiFetch } from '../lib/api';
 
 export default function RegisterPage() {
   const [email, setEmail] = useState('');
@@ -10,7 +11,7 @@ export default function RegisterPage() {
     event.preventDefault();
     setMessage('');
 
-    const response = await fetch('/api/auth/register', {
+    const response = await apiFetch('/api/auth/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password, role }),

@@ -1,10 +1,11 @@
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { useEffect, useState } from 'react';
+import { apiFetch } from '../lib/api';
 export default function TicketPage() {
     const [tickets, setTickets] = useState([]);
     const [error, setError] = useState('');
     useEffect(() => {
-        fetch('/api/tickets/me')
+        apiFetch('/api/tickets/me')
             .then((res) => res.json())
             .then((data) => setTickets(data))
             .catch(() => setError('Unable to fetch tickets.'));

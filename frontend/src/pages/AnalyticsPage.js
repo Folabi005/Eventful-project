@@ -1,5 +1,6 @@
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { useEffect, useState } from 'react';
+import { apiFetch } from '../lib/api';
 export default function AnalyticsPage() {
     const [stats, setStats] = useState(null);
     const [error, setError] = useState('');
@@ -9,7 +10,7 @@ export default function AnalyticsPage() {
             setError('Please log in as a creator to see analytics.');
             return;
         }
-        fetch('/api/analytics/creator', { headers: { Authorization: `Bearer ${token}` } })
+        apiFetch('/api/analytics/creator', { headers: { Authorization: `Bearer ${token}` } })
             .then((res) => res.json())
             .then((data) => setStats(data))
             .catch(() => setError('Unable to load analytics.'));

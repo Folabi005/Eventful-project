@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { apiFetch } from '../lib/api';
 
 interface TicketItem {
   id: string;
@@ -12,7 +13,7 @@ export default function TicketPage() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    fetch('/api/tickets/me')
+    apiFetch('/api/tickets/me')
       .then((res) => res.json())
       .then((data) => setTickets(data))
       .catch(() => setError('Unable to fetch tickets.'));

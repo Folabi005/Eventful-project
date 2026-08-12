@@ -1,5 +1,6 @@
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { useState } from 'react';
+import { apiFetch } from '../lib/api';
 export default function CreateEventPage() {
     const [form, setForm] = useState({
         title: '',
@@ -18,7 +19,7 @@ export default function CreateEventPage() {
             setMessage('Please log in as a creator to publish events.');
             return;
         }
-        const response = await fetch('/api/events', {
+        const response = await apiFetch('/api/events', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
             body: JSON.stringify({

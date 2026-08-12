@@ -1,4 +1,5 @@
 import { FormEvent, useState } from 'react';
+import { apiFetch } from '../lib/api';
 
 export default function CreateEventPage() {
   const [form, setForm] = useState({
@@ -21,7 +22,7 @@ export default function CreateEventPage() {
       return;
     }
 
-    const response = await fetch('/api/events', {
+    const response = await apiFetch('/api/events', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       body: JSON.stringify({

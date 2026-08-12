@@ -1,5 +1,6 @@
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { useEffect, useState } from 'react';
+import { apiFetch } from '../lib/api';
 export default function ApplicantPage() {
     const [applicants, setApplicants] = useState([]);
     const [error, setError] = useState('');
@@ -9,7 +10,7 @@ export default function ApplicantPage() {
             setError('Please log in as a creator to view applicants.');
             return;
         }
-        fetch('/api/applicants/creator', { headers: { Authorization: `Bearer ${token}` } })
+        apiFetch('/api/applicants/creator', { headers: { Authorization: `Bearer ${token}` } })
             .then((res) => res.json())
             .then((data) => setApplicants(data))
             .catch(() => setError('Unable to load applicants.'));

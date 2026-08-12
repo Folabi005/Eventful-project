@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { apiFetch } from '../lib/api';
 
 interface EventItem {
   id: string;
@@ -15,7 +16,7 @@ export default function EventsPage() {
   const [message, setMessage] = useState('');
 
   useEffect(() => {
-    fetch('/api/events')
+    apiFetch('/api/events')
       .then((res) => res.json())
       .then((data) => setEvents(data))
       .catch(() => setError('Unable to load events.'));
@@ -30,7 +31,7 @@ export default function EventsPage() {
 
     setMessage('Processing ticket purchase...');
 
-    const initResponse = await fetch('/api/payments/initialize', {
+    const initResponse = await apiFetch('/api/payments/initialize', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       body: JSON.stringify({ eventId, amountCents }),
@@ -44,14 +45,14 @@ export default function EventsPage() {
 
     const initData = await initResponse.json();
     const reference = initData.paymentData.reference;
-    const verifyResponse = await fetch(`/api/payments/verify?reference=${reference}`);
+    const verifyResponse = await apiFetch(`/api/payments/verify?reference=${reference}`);
     if (!verifyResponse.ok) {
       const body = await verifyResponse.json();
       setMessage(body.message || 'Unable to verify payment.');
       return;
     }
 
-    const purchaseResponse = await fetch('/api/tickets/purchase', {
+    const purchaseResponse = await apiFetch('/api/tickets/purchase', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       body: JSON.stringify({ eventId, paymentReference: reference }),
