@@ -1,0 +1,4 @@
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+export default function HomePage() {
+    return (_jsxs("section", { className: "page home-page", children: [_jsxs("div", { className: "hero-card", children: [_jsx("h1", { children: "Experience the moments that matter." }), _jsx("p", { children: "Discover events, buy tickets, and manage your schedule with ease." })] }), _jsxs("div", { className: "feature-grid", children: [_jsxs("article", { children: [_jsx("h2", { children: "For creators" }), _jsx("p", { children: "Publish events, track ticket sales, and send reminders to attendees." })] }), _jsxs("article", { children: [_jsx("h2", { children: "For eventees" }), _jsx("p", { children: "Browse events, purchase tickets, and get QR code check-in support." })] }), _jsxs("article", { children: [_jsx("h2", { children: "Analytics" }), _jsx("p", { children: "See attendance and payment info across every event." })] })] })] }));
+}

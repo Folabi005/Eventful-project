@@ -1,10 +1,34 @@
 import { eventRepo, ticketRepo, paymentRepo } from '../repositories/store';
 import { cacheService } from './cacheService';
 
+type EventStats = {
+  eventId: string;
+  attendeeCount: number;
+  ticketsSold: number;
+  scannedCount: number;
+  paymentsProcessed: number;
+  totalRevenueCents: number;
+};
+
+type CreatorStats = {
+  creatorId: string;
+  totalAttendees: number;
+  totalTicketsSold: number;
+  totalScanned: number;
+  totalPayments: number;
+  totalRevenueCents: number;
+  eventDetails: Array<{
+    eventId: string;
+    title: string;
+    ticketsSold: number;
+    revenueCents: number;
+  }>;
+};
+
 const CREATOR_ANALYTICS_CACHE_KEY = 'creator_analytics';
 
 export const analyticsService = {
-  eventStats: (eventId: string) => {
+  eventStats: (eventId: string): EventStats => {
     const event = eventRepo.findById(eventId);
     if (!event) {
       throw new Error('Event not found');
@@ -20,16 +44,16 @@ export const analyticsService = {
       totalRevenueCents: payments.reduce((sum, payment) => sum + payment.amountCents, 0),
     };
   },
-  creatorStats: (creatorId: string) => {
+  creatorStats: (creatorId: string): CreatorStats => {
     const cacheKey = `${CREATOR_ANALYTICS_CACHE_KEY}_${creatorId}`;
-    const cached = cacheService.get<ReturnType<typeof analyticsService.creatorStats>>(cacheKey);
+    const cached = cacheService.get<CreatorStats>(cacheKey);
     if (cached) return cached;
 
     const events = eventRepo.findByCreator(creatorId);
     const eventIds = events.map((event) => event.id);
     const allTickets = eventIds.flatMap((id) => ticketRepo.findByEvent(id));
     const allPayments = paymentRepo.findByCreator(creatorId);
-    const result = {
+    const result: CreatorStats = {
       creatorId,
       totalAttendees: allTickets.length,
       totalTicketsSold: allTickets.length,

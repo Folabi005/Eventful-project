@@ -96,6 +96,22 @@ describe('Eventful API', () => {
     expect(response.body[0].id).toBe(ticketId);
   });
 
+  it('should expose reminder options and create relative reminders', async () => {
+    const optionsResponse = await request(app).get('/api/reminders/options');
+    expect(optionsResponse.status).toBe(200);
+    expect(Array.isArray(optionsResponse.body)).toBe(true);
+    expect(optionsResponse.body).toContain('1 day before');
+
+    const reminderResponse = await request(app)
+      .post('/api/reminders')
+      .set('Authorization', `Bearer ${eventeeToken}`)
+      .send({ eventId, remindAt: '1 day before' });
+
+    expect(reminderResponse.status).toBe(201);
+    expect(reminderResponse.body).toHaveProperty('remindAt');
+    expect(new Date(reminderResponse.body.remindAt).toISOString()).not.toBe('Invalid Date');
+  });
+
   it('should scan a ticket successfully', async () => {
     const response = await request(app).post(`/api/tickets/${ticketId}/scan`);
     expect(response.status).toBe(200);

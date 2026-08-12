@@ -1,9 +1,9 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
+import { env } from '../config/env';
 import { userRepo, Role, User } from '../repositories/store';
 
-const secret = process.env.JWT_SECRET || 'eventful-secret';
-
+const secret = env.jwtSecret;
 export const authService = {
   register: (email: string, password: string, role: Role) => {
     return userRepo.create(email, password, role);

@@ -5,4 +5,7 @@ export const apiRateLimiter = rateLimit({
   max: 120,
   standardHeaders: true,
   legacyHeaders: false,
+  message: { message: 'Too many requests, please try again later' },
 });
+
+export default apiRateLimiter;
