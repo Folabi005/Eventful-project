@@ -1,11 +1,11 @@
-import { Collection, Db } from 'mongodb';
+import { Collection, Document } from 'mongodb';
 import bcrypt from 'bcryptjs';
 import { getMongoDb } from '../config/database';
 import type { Event, Payment, Reminder, Role, Ticket, User } from './store';
 
 export type { Event, Payment, Reminder, Role, Ticket, User } from './store';
 
-const getCollection = <T>(name: string): Collection<T> | null => {
+const getCollection = <T extends Document>(name: string): Collection<T> | null => {
   const db = getMongoDb();
   return db ? db.collection<T>(name) : null;
 };
