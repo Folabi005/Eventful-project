@@ -1,39 +1,37 @@
-import { Db, MongoClient } from 'mongodb';
+import { PrismaClient } from '@prisma/client';
 import { env } from './env';
 
-let mongoClient: MongoClient | null = null;
-let mongoDb: Db | null = null;
+export const prisma = new PrismaClient();
+let prismaReady = false;
 
-export async function connectMongo(): Promise<Db | null> {
-  if (!env.mongodbUri) {
-    console.warn('MONGODB_URI is not configured; using in-memory fallback mode.');
+export function isPrismaReady(): boolean {
+  return prismaReady;
+}
+
+export async function connectMongo(): Promise<PrismaClient | null> {
+  if (!env.databaseUrl) {
+    console.warn('DATABASE_URL is not configured; using in-memory fallback mode.');
+    prismaReady = false;
     return null;
   }
 
   try {
-    if (!mongoClient) {
-      mongoClient = new MongoClient(env.mongodbUri);
-      await mongoClient.connect();
-    }
-
-    mongoDb = mongoClient.db(env.mongodbDbName);
-    return mongoDb;
+    await prisma.$connect();
+    prismaReady = true;
+    console.log('PostgreSQL connected via Prisma.');
+    return prisma;
   } catch (error) {
-    console.warn('MongoDB connection failed, falling back to in-memory repository mode:', error);
-    mongoClient = null;
-    mongoDb = null;
+    console.warn('PostgreSQL connection failed, falling back to in-memory repository mode:', error);
+    prismaReady = false;
     return null;
   }
 }
 
-export function getMongoDb(): Db | null {
-  return mongoDb;
+export function getMongoDb(): PrismaClient | null {
+  return prismaReady ? prisma : null;
 }
 
 export async function disconnectMongo(): Promise<void> {
-  if (mongoClient) {
-    await mongoClient.close();
-    mongoClient = null;
-    mongoDb = null;
-  }
+  await prisma.$disconnect();
+  prismaReady = false;
 }

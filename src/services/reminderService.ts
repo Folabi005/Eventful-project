@@ -54,9 +54,10 @@ export const reminderService = {
   listEventReminders: (eventId: string) => reminderRepo.findByEvent(eventId),
   listUpcoming: () => {
     const now = new Date().toISOString();
-    return reminderRepo.findAll()
-      .filter((reminder) => reminder.remindAt >= now)
-      .sort((a, b) => a.remindAt.localeCompare(b.remindAt));
+    const reminders: any[] = (reminderRepo.findAll() as any[]) || [];
+    return reminders
+      .filter((reminder: any) => reminder.remindAt >= now)
+      .sort((a: any, b: any) => a.remindAt.localeCompare(b.remindAt));
   },
   defaultOptions: () => ['1 day before', '1 week before', '2 hours before', '30 minutes before'],
 };

@@ -1,4 +1,12 @@
 import bcrypt from 'bcryptjs';
+import { isPrismaReady } from '../config/database';
+import {
+  prismaUserRepo,
+  prismaEventRepo,
+  prismaTicketRepo,
+  prismaPaymentRepo,
+  prismaReminderRepo,
+} from './prismaRepository';
 
 export type Role = 'creator' | 'eventee';
 
@@ -58,12 +66,10 @@ function uuid() {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
 }
 
-export const userRepo = {
+const memoryUserRepo = {
   create: (email: string, password: string, role: Role) => {
     const existing = users.find((u) => u.email === email);
-    if (existing) {
-      throw new Error('Email already in use');
-    }
+    if (existing) throw new Error('Email already in use');
     const passwordHash = bcrypt.hashSync(password, 8);
     const user: User = { id: uuid(), email, passwordHash, role };
     users.push(user);
@@ -73,7 +79,7 @@ export const userRepo = {
   findById: (id: string) => users.find((u) => u.id === id),
 };
 
-export const eventRepo = {
+const memoryEventRepo = {
   create: (creatorId: string, payload: Omit<Event, 'id' | 'creatorId' | 'shareUrl'>) => {
     const event: Event = {
       id: uuid(),
@@ -89,7 +95,7 @@ export const eventRepo = {
   findAll: () => [...events],
 };
 
-export const ticketRepo = {
+const memoryTicketRepo = {
   create: (eventId: string, userId: string, qrCodeData: string) => {
     const ticket: Ticket = {
       id: uuid(),
@@ -113,7 +119,7 @@ export const ticketRepo = {
   },
 };
 
-export const paymentRepo = {
+const memoryPaymentRepo = {
   create: (eventId: string, userId: string, amountCents: number, reference: string) => {
     const payment: Payment = {
       id: uuid(),
@@ -142,7 +148,7 @@ export const paymentRepo = {
   },
 };
 
-export const reminderRepo = {
+const memoryReminderRepo = {
   create: (userId: string, eventId: string, remindAt: string) => {
     const reminder: Reminder = {
       id: uuid(),
@@ -156,6 +162,65 @@ export const reminderRepo = {
   findByUser: (userId: string) => reminders.filter((reminder) => reminder.userId === userId),
   findByEvent: (eventId: string) => reminders.filter((reminder) => reminder.eventId === eventId),
   findAll: () => [...reminders],
+};
+
+export const userRepo: any = {
+  create: (...args: Parameters<typeof memoryUserRepo.create>) =>
+    isPrismaReady() ? prismaUserRepo.create(...args) : memoryUserRepo.create(...args),
+  findByEmail: (...args: Parameters<typeof memoryUserRepo.findByEmail>) =>
+    isPrismaReady() ? prismaUserRepo.findByEmail(...args) : memoryUserRepo.findByEmail(...args),
+  findById: (...args: Parameters<typeof memoryUserRepo.findById>) =>
+    isPrismaReady() ? prismaUserRepo.findById(...args) : memoryUserRepo.findById(...args),
+};
+
+export const eventRepo: any = {
+  create: (...args: Parameters<typeof memoryEventRepo.create>) =>
+    isPrismaReady() ? prismaEventRepo.create(...args) : memoryEventRepo.create(...args),
+  findById: (...args: Parameters<typeof memoryEventRepo.findById>) =>
+    isPrismaReady() ? prismaEventRepo.findById(...args) : memoryEventRepo.findById(...args),
+  findByCreator: (...args: Parameters<typeof memoryEventRepo.findByCreator>) =>
+    isPrismaReady() ? prismaEventRepo.findByCreator(...args) : memoryEventRepo.findByCreator(...args),
+  findAll: (...args: Parameters<typeof memoryEventRepo.findAll>) =>
+    isPrismaReady() ? prismaEventRepo.findAll(...args) : memoryEventRepo.findAll(...args),
+};
+
+export const ticketRepo: any = {
+  create: (...args: Parameters<typeof memoryTicketRepo.create>) =>
+    isPrismaReady() ? prismaTicketRepo.create(...args) : memoryTicketRepo.create(...args),
+  findByUser: (...args: Parameters<typeof memoryTicketRepo.findByUser>) =>
+    isPrismaReady() ? prismaTicketRepo.findByUser(...args) : memoryTicketRepo.findByUser(...args),
+  findByEvent: (...args: Parameters<typeof memoryTicketRepo.findByEvent>) =>
+    isPrismaReady() ? prismaTicketRepo.findByEvent(...args) : memoryTicketRepo.findByEvent(...args),
+  findById: (...args: Parameters<typeof memoryTicketRepo.findById>) =>
+    isPrismaReady() ? prismaTicketRepo.findById(...args) : memoryTicketRepo.findById(...args),
+  markScanned: (...args: Parameters<typeof memoryTicketRepo.markScanned>) =>
+    isPrismaReady() ? prismaTicketRepo.markScanned(...args) : memoryTicketRepo.markScanned(...args),
+};
+
+export const paymentRepo: any = {
+  create: (...args: Parameters<typeof memoryPaymentRepo.create>) =>
+    isPrismaReady() ? prismaPaymentRepo.create(...args) : memoryPaymentRepo.create(...args),
+  findByCreator: (...args: Parameters<typeof memoryPaymentRepo.findByCreator>) =>
+    isPrismaReady() ? prismaPaymentRepo.findByCreator(...args) : memoryPaymentRepo.findByCreator(...args),
+  findByUser: (...args: Parameters<typeof memoryPaymentRepo.findByUser>) =>
+    isPrismaReady() ? prismaPaymentRepo.findByUser(...args) : memoryPaymentRepo.findByUser(...args),
+  findByEvent: (...args: Parameters<typeof memoryPaymentRepo.findByEvent>) =>
+    isPrismaReady() ? prismaPaymentRepo.findByEvent(...args) : memoryPaymentRepo.findByEvent(...args),
+  findByReference: (...args: Parameters<typeof memoryPaymentRepo.findByReference>) =>
+    isPrismaReady() ? prismaPaymentRepo.findByReference(...args) : memoryPaymentRepo.findByReference(...args),
+  updateStatus: (...args: Parameters<typeof memoryPaymentRepo.updateStatus>) =>
+    isPrismaReady() ? prismaPaymentRepo.updateStatus(...args) : memoryPaymentRepo.updateStatus(...args),
+};
+
+export const reminderRepo: any = {
+  create: (...args: Parameters<typeof memoryReminderRepo.create>) =>
+    isPrismaReady() ? prismaReminderRepo.create(...args) : memoryReminderRepo.create(...args),
+  findByUser: (...args: Parameters<typeof memoryReminderRepo.findByUser>) =>
+    isPrismaReady() ? prismaReminderRepo.findByUser(...args) : memoryReminderRepo.findByUser(...args),
+  findByEvent: (...args: Parameters<typeof memoryReminderRepo.findByEvent>) =>
+    isPrismaReady() ? prismaReminderRepo.findByEvent(...args) : memoryReminderRepo.findByEvent(...args),
+  findAll: (...args: Parameters<typeof memoryReminderRepo.findAll>) =>
+    isPrismaReady() ? prismaReminderRepo.findAll(...args) : memoryReminderRepo.findAll(...args),
 };
 
 export const store = { users, events, tickets, reminders, payments };

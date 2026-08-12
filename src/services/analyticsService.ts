@@ -29,19 +29,19 @@ const CREATOR_ANALYTICS_CACHE_KEY = 'creator_analytics';
 
 export const analyticsService = {
   eventStats: (eventId: string): EventStats => {
-    const event = eventRepo.findById(eventId);
+    const event = eventRepo.findById(eventId) as any;
     if (!event) {
       throw new Error('Event not found');
     }
-    const tickets = ticketRepo.findByEvent(eventId);
-    const payments = paymentRepo.findByEvent(eventId);
+    const tickets: any[] = (ticketRepo.findByEvent(eventId) as any[]) || [];
+    const payments: any[] = (paymentRepo.findByEvent(eventId) as any[]) || [];
     return {
       eventId,
       attendeeCount: tickets.length,
       ticketsSold: tickets.length,
-      scannedCount: tickets.filter((ticket) => ticket.scanned).length,
+      scannedCount: tickets.filter((ticket: any) => ticket.scanned).length,
       paymentsProcessed: payments.length,
-      totalRevenueCents: payments.reduce((sum, payment) => sum + payment.amountCents, 0),
+      totalRevenueCents: payments.reduce((sum: number, payment: any) => sum + payment.amountCents, 0),
     };
   },
   creatorStats: (creatorId: string): CreatorStats => {
@@ -49,22 +49,22 @@ export const analyticsService = {
     const cached = cacheService.get<CreatorStats>(cacheKey);
     if (cached) return cached;
 
-    const events = eventRepo.findByCreator(creatorId);
-    const eventIds = events.map((event) => event.id);
-    const allTickets = eventIds.flatMap((id) => ticketRepo.findByEvent(id));
-    const allPayments = paymentRepo.findByCreator(creatorId);
+    const events: any[] = (eventRepo.findByCreator(creatorId) as any[]) || [];
+    const eventIds = events.map((event: any) => event.id);
+    const allTickets: any[] = eventIds.flatMap((id: string) => ticketRepo.findByEvent(id) as any[]);
+    const allPayments: any[] = (paymentRepo.findByCreator(creatorId) as any[]) || [];
     const result: CreatorStats = {
       creatorId,
       totalAttendees: allTickets.length,
       totalTicketsSold: allTickets.length,
-      totalScanned: allTickets.filter((ticket) => ticket.scanned).length,
+      totalScanned: allTickets.filter((ticket: any) => ticket.scanned).length,
       totalPayments: allPayments.length,
-      totalRevenueCents: allPayments.reduce((sum, payment) => sum + payment.amountCents, 0),
-      eventDetails: events.map((event) => ({
+      totalRevenueCents: allPayments.reduce((sum: number, payment: any) => sum + payment.amountCents, 0),
+      eventDetails: events.map((event: any) => ({
         eventId: event.id,
         title: event.title,
-        ticketsSold: ticketRepo.findByEvent(event.id).length,
-        revenueCents: paymentRepo.findByEvent(event.id).reduce((sum, payment) => sum + payment.amountCents, 0),
+        ticketsSold: (ticketRepo.findByEvent(event.id) as any[]).length,
+        revenueCents: (paymentRepo.findByEvent(event.id) as any[]).reduce((sum: number, payment: any) => sum + payment.amountCents, 0),
       })),
     };
 

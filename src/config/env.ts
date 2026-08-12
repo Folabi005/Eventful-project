@@ -10,6 +10,7 @@ export const env = {
   jwtSecret: process.env.JWT_SECRET || 'eventful-dev-secret',
   paystackSecretKey: process.env.PAYSTACK_SECRET_KEY || '',
   paystackPublicKey: process.env.PAYSTACK_PUBLIC_KEY || '',
+  databaseUrl: process.env.DATABASE_URL || '',
   mongodbUri: process.env.MONGODB_URI || '',
   mongodbDbName: process.env.MONGODB_DB_NAME || 'eventful',
   redisUrl: process.env.UPSTASH_REDIS_REST_URL || '',
